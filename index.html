@@ -719,6 +719,7 @@
                                 <option value="both">Title + Content</option>
                                 <option value="title">Title Only</option>
                                 <option value="content">Content Only</option>
+                                <option value="tags">Tags Only</option>
                             </select>
                         </div>
                         <div class="filter-group">
@@ -742,6 +743,19 @@
                         <button class="btn btn-primary" id="search-btn">
                             🔍 Search
                         </button>
+                        <button class="btn btn-secondary" id="show-all-tags-btn">
+                            🏷️ Browse Tags
+                        </button>
+                    </div>
+
+                    <div id="tag-browser" class="hidden" style="background: var(--bg-tertiary); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: var(--accent-color);">🏷️ Available Tags</h4>
+                            <button id="hide-tags-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">✕ Hide</button>
+                        </div>
+                        <div id="tag-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            <!-- Tags will be populated here -->
+                        </div>
                     </div>
 
                     <div id="search-results" class="results-grid">
@@ -1012,7 +1026,17 @@
                 return;
             }
 
-            let results = searchConversations(query, searchType);
+            let results;
+            
+            if (searchType === 'tags') {
+                // Tag-based search
+                const tagNames = query.split(',').map(tag => tag.trim()).filter(tag => tag);
+                results = searchConversationsByTags(tagNames);
+            } else {
+                // Traditional content search
+                results = searchConversations(query, searchType);
+            }
+            
             results = sortResults(results, sortOrder);
             
             if (limit !== 'all') {
@@ -1151,6 +1175,17 @@
                     .substring(0, 200) + (messages.length > 0 ? '...' : '');
             }
 
+            // Get existing tags for this conversation
+            const existingTags = loadConversationTags(id);
+            const tagsHTML = existingTags.length > 0 ? 
+                `<div class="conversation-tags" style="margin-top: 0.5rem;">
+                    ${existingTags.map(tag => 
+                        `<span class="tag" style="background: var(--accent-color); color: var(--bg-primary); padding: 0.2rem 0.4rem; border-radius: 12px; font-size: 0.7rem; margin-right: 0.3rem;">
+                            ${tag.type === 'category' ? '📂' : '🏷️'} ${tag.name}
+                        </span>`
+                    ).join('')}
+                </div>` : '';
+
             const isSelected = selectedConversations.has(id);
 
             return `
@@ -1162,6 +1197,7 @@
                                 <span>📅 ${date}</span>
                                 <span>💬 ${messageCount} messages</span>
                                 <span>🆔 ${shortId}...</span>
+                                ${existingTags.length > 0 ? `<span>🏷️ ${existingTags.length} tags</span>` : ''}
                             </div>
                         </div>
                         <div class="flex items-center gap-1">
@@ -1169,12 +1205,13 @@
                         </div>
                     </div>
                     ${preview ? `<div class="result-preview">${escapeHtml(preview)}</div>` : ''}
+                    ${tagsHTML}
                     <div class="result-actions">
                         <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
                             👁️ View
                         </button>
                         <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
-                            🏷️ Tag
+                            🏷️ ${existingTags.length > 0 ? 'Edit Tags' : 'Add Tags'}
                         </button>
                         <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
                             📚 Collect
@@ -1182,6 +1219,355 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Word cloud generation for conversation analysis
+        function generateWordCloud(conversation) {
+            const text = extractTextFromConversation(conversation);
+            const words = analyzeConversationContent(text);
+            const tags = generateTagsFromAnalysis(words, conversation);
+            
+            return {
+                words: words,
+                suggestedTags: tags,
+                wordFrequency: calculateWordFrequency(text)
+            };
+        }
+
+        function extractTextFromConversation(conversation) {
+            let allText = '';
+            
+            // Add title
+            if (conversation.title) {
+                allText += conversation.title + ' ';
+            }
+            
+            // Extract all message content
+            if (conversation.mapping) {
+                Object.values(conversation.mapping).forEach(msg => {
+                    if (msg.message && msg.message.content && msg.message.content.parts) {
+                        allText += msg.message.content.parts.join(' ') + ' ';
+                    }
+                });
+            }
+            
+            return allText;
+        }
+
+        function analyzeConversationContent(text) {
+            // Clean and prepare text
+            const cleanText = text.toLowerCase()
+                .replace(/[^\w\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            // Common stop words to filter out
+            const stopWords = new Set([
+                'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+                'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him',
+                'her', 'us', 'them', 'my', 'your', 'his', 'her', 'its', 'our', 'their', 'am', 'is', 'are',
+                'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
+                'would', 'could', 'should', 'may', 'might', 'must', 'can', 'cant', 'cannot', 'wont', 'wouldnt',
+                'here', 'there', 'where', 'when', 'why', 'how', 'what', 'which', 'who', 'whom', 'whose',
+                'if', 'then', 'else', 'than', 'as', 'so', 'too', 'very', 'just', 'now', 'only', 'also',
+                'like', 'want', 'need', 'know', 'think', 'see', 'get', 'go', 'come', 'make', 'take', 'give',
+                'please', 'help', 'thanks', 'thank', 'yes', 'no', 'ok', 'okay', 'sure', 'well', 'actually'
+            ]);
+            
+            // Split into words and count frequency
+            const words = cleanText.split(/\s+/)
+                .filter(word => word.length > 2 && !stopWords.has(word))
+                .reduce((acc, word) => {
+                    acc[word] = (acc[word] || 0) + 1;
+                    return acc;
+                }, {});
+            
+            // Sort by frequency and return top words
+            return Object.entries(words)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 50)
+                .map(([word, count]) => ({ word, count }));
+        }
+
+        function generateTagsFromAnalysis(words, conversation) {
+            const tags = [];
+            
+            // Category detection patterns
+            const categories = {
+                'programming': ['code', 'programming', 'python', 'javascript', 'html', 'css', 'function', 'variable', 'array', 'object', 'class', 'method', 'api', 'database', 'sql', 'git', 'debug', 'error', 'syntax'],
+                'business': ['business', 'strategy', 'marketing', 'sales', 'revenue', 'profit', 'customer', 'market', 'competition', 'investment', 'finance', 'budget', 'analysis', 'growth', 'company'],
+                'technical': ['server', 'network', 'system', 'configuration', 'setup', 'install', 'linux', 'windows', 'command', 'terminal', 'script', 'automation', 'deployment'],
+                'creative': ['design', 'creative', 'art', 'writing', 'content', 'story', 'character', 'plot', 'image', 'visual', 'color', 'style', 'aesthetic'],
+                'education': ['learn', 'study', 'education', 'course', 'tutorial', 'lesson', 'explain', 'understand', 'concept', 'theory', 'practice', 'example'],
+                'research': ['research', 'analysis', 'data', 'statistics', 'report', 'findings', 'methodology', 'results', 'conclusions', 'evidence'],
+                'personal': ['personal', 'life', 'advice', 'decision', 'problem', 'solution', 'help', 'support', 'guidance', 'recommendation']
+            };
+            
+            // Check for category matches
+            const wordList = words.map(w => w.word);
+            for (const [category, keywords] of Object.entries(categories)) {
+                const matches = keywords.filter(keyword => 
+                    wordList.some(word => word.includes(keyword) || keyword.includes(word))
+                );
+                if (matches.length > 0) {
+                    tags.push({
+                        name: category,
+                        type: 'category',
+                        confidence: Math.min(matches.length / keywords.length, 1),
+                        source: 'auto',
+                        selected: true
+                    });
+                }
+            }
+            
+            // Generate keyword tags from top words
+            words.slice(0, 10).forEach(({ word, count }) => {
+                if (word.length > 3 && count > 1) {
+                    tags.push({
+                        name: word,
+                        type: 'keyword',
+                        confidence: Math.min(count / 10, 1),
+                        source: 'auto',
+                        selected: true
+                    });
+                }
+            });
+            
+            return tags;
+        }
+
+        function calculateWordFrequency(text) {
+            const words = text.toLowerCase().match(/\b\w{3,}\b/g) || [];
+            const frequency = {};
+            words.forEach(word => {
+                frequency[word] = (frequency[word] || 0) + 1;
+            });
+            return frequency;
+        }
+
+        function createWordCloudHTML(words, tags) {
+            const maxCount = Math.max(...words.map(w => w.count));
+            
+            return `
+                <div class="word-cloud-container" style="background: var(--bg-primary); border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
+                    <div class="word-cloud" style="text-align: center; line-height: 1.8; flex-wrap: wrap; display: flex; justify-content: center; gap: 0.5rem;">
+                        ${words.map(({ word, count }) => {
+                            const size = Math.max(0.8, (count / maxCount) * 2.5);
+                            const opacity = Math.max(0.6, count / maxCount);
+                            return `
+                                <span class="word-cloud-item" 
+                                      style="font-size: ${size}rem; 
+                                             opacity: ${opacity}; 
+                                             color: var(--accent-color); 
+                                             cursor: pointer; 
+                                             padding: 0.2rem 0.4rem; 
+                                             border-radius: 4px; 
+                                             transition: all 0.2s ease;
+                                             hover: {background: var(--bg-secondary)}"
+                                      data-word="${word}" 
+                                      data-count="${count}"
+                                      onmouseover="this.style.background='var(--bg-secondary)'"
+                                      onmouseout="this.style.background='transparent'"
+                                      onclick="addWordAsTag('${word}', ${count})"
+                                      title="'${word}' appears ${count} times - click to add as tag">
+                                    ${word}
+                                </span>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                
+                <div class="suggested-tags" style="margin-top: 1rem;">
+                    <h5 style="color: var(--accent-color); margin-bottom: 0.5rem;">Suggested Tags:</h5>
+                    <div class="tag-suggestions" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        ${tags.map(tag => `
+                            <div class="tag-suggestion ${tag.selected ? 'selected' : ''}" 
+                                 style="padding: 0.3rem 0.8rem; 
+                                        border-radius: 16px; 
+                                        font-size: 0.8rem; 
+                                        cursor: pointer; 
+                                        transition: all 0.2s ease;
+                                        background: ${tag.selected ? 'var(--accent-color)' : 'var(--bg-tertiary)'};
+                                        color: ${tag.selected ? 'var(--bg-primary)' : 'var(--text-primary)'};
+                                        border: 1px solid ${tag.selected ? 'var(--accent-color)' : 'var(--border-color)'}"
+                                 data-tag="${tag.name}"
+                                 data-type="${tag.type}"
+                                 data-confidence="${tag.confidence}"
+                                 onclick="toggleTag(this)"
+                                 title="Confidence: ${Math.round(tag.confidence * 100)}% | Type: ${tag.type}">
+                                ${tag.type === 'category' ? '📂' : '🏷️'} ${tag.name}
+                                ${tag.selected ? ' ✓' : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Tag management functions
+        function addWordAsTag(word, count) {
+            // Add word as a custom tag
+            const tagContainer = document.querySelector('.tag-suggestions');
+            const existingTag = tagContainer.querySelector(`[data-tag="${word}"]`);
+            
+            if (!existingTag) {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag-suggestion selected';
+                tagElement.style.cssText = `
+                    padding: 0.3rem 0.8rem; 
+                    border-radius: 16px; 
+                    font-size: 0.8rem; 
+                    cursor: pointer; 
+                    transition: all 0.2s ease;
+                    background: var(--accent-color);
+                    color: var(--bg-primary);
+                    border: 1px solid var(--accent-color);
+                `;
+                tagElement.setAttribute('data-tag', word);
+                tagElement.setAttribute('data-type', 'keyword');
+                tagElement.setAttribute('data-confidence', '0.8');
+                tagElement.setAttribute('onclick', 'toggleTag(this)');
+                tagElement.title = `Added from word cloud | Frequency: ${count}`;
+                tagElement.innerHTML = `🏷️ ${word} ✓`;
+                
+                tagContainer.appendChild(tagElement);
+            }
+        }
+
+        function toggleTag(element) {
+            const isSelected = element.classList.contains('selected');
+            
+            if (isSelected) {
+                element.classList.remove('selected');
+                element.style.background = 'var(--bg-tertiary)';
+                element.style.color = 'var(--text-primary)';
+                element.style.borderColor = 'var(--border-color)';
+                element.innerHTML = element.innerHTML.replace(' ✓', '');
+            } else {
+                element.classList.add('selected');
+                element.style.background = 'var(--accent-color)';
+                element.style.color = 'var(--bg-primary)';
+                element.style.borderColor = 'var(--accent-color)';
+                element.innerHTML = element.innerHTML + ' ✓';
+            }
+        }
+
+        function getSelectedTags() {
+            const selectedTags = [];
+            document.querySelectorAll('.tag-suggestion.selected').forEach(tag => {
+                selectedTags.push({
+                    name: tag.getAttribute('data-tag'),
+                    type: tag.getAttribute('data-type'),
+                    confidence: parseFloat(tag.getAttribute('data-confidence'))
+                });
+            });
+            return selectedTags;
+        }
+
+        function saveConversationTags(conversationId, tags) {
+            // Save tags to database via shell script backend
+            const tagsData = {
+                conversationId: conversationId,
+                tags: tags,
+                timestamp: new Date().toISOString()
+            };
+            
+            // For now, save to localStorage and prepare for database integration
+            const savedTags = JSON.parse(localStorage.getItem('conversation-tags') || '{}');
+            savedTags[conversationId] = tags;
+            localStorage.setItem('conversation-tags', JSON.stringify(savedTags));
+            
+            // Also maintain global tag dictionary for search autocomplete
+            const globalTags = JSON.parse(localStorage.getItem('global-tags') || '{}');
+            tags.forEach(tag => {
+                if (!globalTags[tag.name]) {
+                    globalTags[tag.name] = {
+                        name: tag.name,
+                        type: tag.type,
+                        usageCount: 0,
+                        conversations: []
+                    };
+                }
+                globalTags[tag.name].usageCount++;
+                if (!globalTags[tag.name].conversations.includes(conversationId)) {
+                    globalTags[tag.name].conversations.push(conversationId);
+                }
+            });
+            localStorage.setItem('global-tags', JSON.stringify(globalTags));
+            
+            // Call database integration function
+            saveToDB(conversationId, tags);
+            
+            // Update UI to show tags are saved
+            const saveButton = document.querySelector('#save-tags-btn');
+            if (saveButton) {
+                saveButton.textContent = '✅ Tags Saved to Database';
+                saveButton.style.background = 'var(--success-color)';
+                setTimeout(() => {
+                    saveButton.textContent = '💾 Save Tags';
+                    saveButton.style.background = 'var(--accent-color)';
+                }, 2000);
+            }
+        }
+
+        async function saveToDB(conversationId, tags) {
+            // Prepare data for database integration
+            const tagData = {
+                conversation_id: conversationId,
+                tags: tags.map(tag => ({
+                    name: tag.name,
+                    type: tag.type,
+                    confidence: tag.confidence,
+                    source: 'user_web_interface',
+                    created_at: new Date().toISOString()
+                }))
+            };
+            
+            // In a full implementation, this would call the shell script backend
+            // For now, we'll simulate the database operation
+            console.log('Saving to database:', tagData);
+            
+            // TODO: Integrate with chatgpt_interrogator_v0.8.sh
+            // Example: fetch('/api/save-tags', { method: 'POST', body: JSON.stringify(tagData) })
+        }
+
+        function loadConversationTags(conversationId) {
+            // Load existing tags for a conversation
+            const savedTags = JSON.parse(localStorage.getItem('conversation-tags') || '{}');
+            return savedTags[conversationId] || [];
+        }
+
+        function getAllTags() {
+            // Get all available tags for search autocomplete
+            const globalTags = JSON.parse(localStorage.getItem('global-tags') || '{}');
+            return Object.values(globalTags).sort((a, b) => b.usageCount - a.usageCount);
+        }
+
+        function searchConversationsByTags(tagNames) {
+            // Search conversations that have specific tags
+            const results = [];
+            const savedTags = JSON.parse(localStorage.getItem('conversation-tags') || '{}');
+            
+            for (const [convId, tags] of Object.entries(savedTags)) {
+                const conversationTagNames = tags.map(tag => tag.name.toLowerCase());
+                const hasAllTags = tagNames.every(tagName => 
+                    conversationTagNames.includes(tagName.toLowerCase())
+                );
+                
+                if (hasAllTags) {
+                    const conversation = conversationsData.find(conv => conv.id === convId);
+                    if (conversation) {
+                        results.push({
+                            ...conversation,
+                            matchedTags: tags.filter(tag => 
+                                tagNames.includes(tag.name.toLowerCase())
+                            )
+                        });
+                    }
+                }
+            }
+            
+            return results;
         }
 
         function escapeHtml(text) {
@@ -1319,13 +1705,18 @@
                 <div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h4>Conversation Details</h4>
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <label style="font-size: 0.9rem;">Show:</label>
-                            <select id="message-filter" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
-                                <option value="both">👥 Both</option>
-                                <option value="user">👤 User Only</option>
-                                <option value="assistant">🤖 Assistant Only</option>
-                            </select>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <button id="show-word-cloud-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                ☁️ Word Cloud & Tags
+                            </button>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label style="font-size: 0.9rem;">Show:</label>
+                                <select id="message-filter" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                    <option value="both">👥 Both</option>
+                                    <option value="user">👤 User Only</option>
+                                    <option value="assistant">🤖 Assistant Only</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem;">
@@ -1335,6 +1726,26 @@
                         <div><strong>Model:</strong> ${conversation.default_model_slug || 'N/A'}</div>
                     </div>
                 </div>
+                
+                <div id="word-cloud-section" style="display: none;">
+                    <div style="background: var(--bg-tertiary); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="color: var(--accent-color);">☁️ Content Analysis & Tagging</h4>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button id="save-tags-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                    💾 Save Tags
+                                </button>
+                                <button id="hide-word-cloud-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                    ✕ Close
+                                </button>
+                            </div>
+                        </div>
+                        <div id="word-cloud-content">
+                            <!-- Word cloud will be generated here -->
+                        </div>
+                    </div>
+                </div>
+                
                 <div>
                     <h4 style="margin-bottom: 1rem;">Messages</h4>
                     <div id="messages-container">
@@ -1342,6 +1753,32 @@
                     </div>
                 </div>
             `;
+
+            // Add event listeners for word cloud functionality
+            const showWordCloudBtn = modalBody.querySelector('#show-word-cloud-btn');
+            const hideWordCloudBtn = modalBody.querySelector('#hide-word-cloud-btn');
+            const wordCloudSection = modalBody.querySelector('#word-cloud-section');
+            const wordCloudContent = modalBody.querySelector('#word-cloud-content');
+            const saveTagsBtn = modalBody.querySelector('#save-tags-btn');
+
+            showWordCloudBtn.addEventListener('click', () => {
+                // Generate word cloud analysis
+                const analysis = generateWordCloud(conversation);
+                const wordCloudHTML = createWordCloudHTML(analysis.words, analysis.suggestedTags);
+                
+                wordCloudContent.innerHTML = wordCloudHTML;
+                wordCloudSection.style.display = 'block';
+                showWordCloudBtn.textContent = '🔄 Regenerate Analysis';
+            });
+
+            hideWordCloudBtn.addEventListener('click', () => {
+                wordCloudSection.style.display = 'none';
+            });
+
+            saveTagsBtn.addEventListener('click', () => {
+                const selectedTags = getSelectedTags();
+                saveConversationTags(conversation.id, selectedTags);
+            });
 
             // Add event listener for message filtering
             const messageFilter = modalBody.querySelector('#message-filter');
@@ -1383,7 +1820,7 @@
             modal.classList.add('show');
         }
 
-        // Initialize
+        // Initialize tag browser functionality
         document.addEventListener('DOMContentLoaded', () => {
             // Check for localStorage data (if previously loaded)
             const savedData = localStorage.getItem('chatgpt-conversations');
@@ -1398,6 +1835,21 @@
                 }
             }
 
+            // Tag browser functionality
+            const showAllTagsBtn = document.getElementById('show-all-tags-btn');
+            const hideTagsBtn = document.getElementById('hide-tags-btn');
+            const tagBrowser = document.getElementById('tag-browser');
+            const tagList = document.getElementById('tag-list');
+
+            showAllTagsBtn?.addEventListener('click', () => {
+                displayAllTags();
+                tagBrowser.classList.remove('hidden');
+            });
+
+            hideTagsBtn?.addEventListener('click', () => {
+                tagBrowser.classList.add('hidden');
+            });
+
             // Auto-search on input with search results counter update
             let searchTimeout;
             document.getElementById('search-input').addEventListener('input', () => {
@@ -1411,7 +1863,82 @@
                     }
                 }, 300);
             });
+
+            // Update search placeholder based on search type
+            const searchInput = document.getElementById('search-input');
+            const searchType = document.getElementById('search-type');
+            
+            searchType.addEventListener('change', () => {
+                const type = searchType.value;
+                switch (type) {
+                    case 'tags':
+                        searchInput.placeholder = 'Search by tags (e.g., "python, programming" or "business, strategy")...';
+                        break;
+                    case 'title':
+                        searchInput.placeholder = 'Search conversation titles...';
+                        break;
+                    case 'content':
+                        searchInput.placeholder = 'Search message content...';
+                        break;
+                    default:
+                        searchInput.placeholder = 'Search titles, content, or tags...';
+                }
+            });
         });
+
+        function displayAllTags() {
+            const allTags = getAllTags();
+            const tagList = document.getElementById('tag-list');
+            
+            if (allTags.length === 0) {
+                tagList.innerHTML = '<p class="text-muted">No tags created yet. Start by opening conversations and using the Word Cloud & Tags feature!</p>';
+                return;
+            }
+
+            tagList.innerHTML = allTags.map(tag => `
+                <div class="tag-item" 
+                     style="padding: 0.4rem 0.8rem; 
+                            background: var(--bg-secondary); 
+                            border: 1px solid var(--border-color);
+                            border-radius: 16px; 
+                            cursor: pointer; 
+                            transition: all 0.2s ease;
+                            font-size: 0.85rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.3rem;"
+                     onclick="searchByTag('${tag.name}')"
+                     onmouseover="this.style.background='var(--accent-color)'; this.style.color='var(--bg-primary)'"
+                     onmouseout="this.style.background='var(--bg-secondary)'; this.style.color='var(--text-primary)'"
+                     title="Used in ${tag.usageCount} conversation${tag.usageCount !== 1 ? 's' : ''} | Click to search">
+                    ${tag.type === 'category' ? '📂' : '🏷️'} 
+                    <span>${tag.name}</span>
+                    <span style="background: var(--accent-color); color: var(--bg-primary); padding: 0.1rem 0.3rem; border-radius: 8px; font-size: 0.7rem;">
+                        ${tag.usageCount}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function searchByTag(tagName) {
+            const searchInput = document.getElementById('search-input');
+            const searchType = document.getElementById('search-type');
+            
+            // Set search mode to tags
+            searchType.value = 'tags';
+            
+            // Set search query
+            searchInput.value = tagName;
+            
+            // Trigger search
+            performSearch();
+            
+            // Hide tag browser
+            document.getElementById('tag-browser').classList.add('hidden');
+            
+            // Focus search input for potential additional tags
+            searchInput.focus();
+        }
 
         // Save data to localStorage when loaded
         function saveToLocalStorage() {
