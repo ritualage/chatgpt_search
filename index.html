@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT History Interrogator</title>
+    <style>
+        /* Base Theme Variables - Steel Blue (Default) */
+        :root {
+            --bg-primary: #141719;
+            --bg-secondary: #1c1f22;
+            --bg-tertiary: #252a2e;
+            --accent-color: #5a7a8f;
+            --accent-hover: #6d8da3;
+            --text-primary: #eef2f5;
+            --text-secondary: #c0c0c0;
+            --text-muted: #888;
+            --border-color: #343a3e;
+            --success-color: #4ade80;
+            --warning-color: #fbbf24;
+            --error-color: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Theme Variations */
+        .theme-warm-slate {
+            --bg-primary: #1a1815;
+            --bg-secondary: #242018;
+            --bg-tertiary: #2d2a20;
+            --accent-color: #8b7355;
+            --accent-hover: #a88866;
+            --text-primary: #f2f0ed;
+            --border-color: #3d3a32;
+        }
+
+        .theme-sage-green {
+            --bg-primary: #141a16;
+            --bg-secondary: #1e211c;
+            --bg-tertiary: #252b23;
+            --accent-color: #5a8c6d;
+            --accent-hover: #6ba47c;
+            --text-primary: #e8f3ed;
+            --border-color: #2d3a32;
+        }
+
+        .theme-forest-moss {
+            --bg-primary: #141a16;
+            --bg-secondary: #1e211c;
+            --bg-tertiary: #252b23;
+            --accent-color: #5a8c6d;
+            --accent-hover: #6ba47c;
+            --text-primary: #e8f3ed;
+            --border-color: #2d3a32;
+        }
+
+        .theme-deep-ocean {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f25;
+            --bg-tertiary: #242c33;
+            --accent-color: #4a90a4;
+            --accent-hover: #5ba3b8;
+            --text-primary: #e6f3f7;
+            --border-color: #2d3439;
+        }
+
+        .theme-steel-blue {
+            --bg-primary: #141719;
+            --bg-secondary: #1c1f22;
+            --bg-tertiary: #252a2e;
+            --accent-color: #5a7a8f;
+            --accent-hover: #6d8da3;
+            --text-primary: #eef2f5;
+            --border-color: #343a3e;
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .logo::before {
+            content: "🧠";
+            font-size: 2rem;
+        }
+
+        .theme-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-selector select {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: var(--bg-secondary);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 120px;
+        }
+
+        .sidebar h3 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-upload {
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-tertiary);
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-color);
+            background: var(--bg-primary);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent-color);
+            background: var(--bg-primary);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-color);
+        }
+
+        .menu-item.active {
+            background: var(--accent-color);
+            color: var(--bg-primary);
+            font-weight: 500;
+        }
+
+        .menu-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Content Area */
+        .content-area {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            min-height: 600px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .content-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(107, 107, 107, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-primary);
+            border-color: var(--accent-color);
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .result-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .result-card.selected {
+            border-color: var(--accent-color);
+            background: var(--bg-primary);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .result-preview {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-top: 1rem;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: var(--accent-color);
+            color: var(--bg-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-select {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+
+            .content-area {
+                order: 1;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0.5rem;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-muted); }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    ChatGPT History Interrogator
+                </div>
+                <div class="theme-selector">
+                    <label for="theme-select">Theme:</label>
+                    <select id="theme-select">
+                        <option value="theme-steel-blue">Steel Blue</option>
+                        <option value="">Current</option>
+                        <option value="theme-warm-slate">Warm Slate</option>
+                        <option value="theme-sage-green">Sage Green</option>
+                        <option value="theme-forest-moss">Forest Moss</option>
+                        <option value="theme-deep-ocean">Deep Ocean</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="container">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="total-conversations">-</span>
+                    <span class="stat-label">Total Conversations</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-messages">-</span>
+                    <span class="stat-label">Messages</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="date-range">-</span>
+                    <span class="stat-label">Date Range</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="selected-count">0</span>
+                    <span class="stat-label">Selected</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- File Upload -->
+                <div class="file-upload">
+                    <h3>📁 Load Data</h3>
+                    <div class="upload-area" id="upload-area">
+                        <span class="upload-icon">📄</span>
+                        <p>Drop conversations.json here<br>or click to browse</p>
+                        <input type="file" id="file-input" accept=".json" style="display: none;">
+                    </div>
+                    <div id="file-status" class="mt-1 text-muted text-center hidden"></div>
+                </div>
+
+                <!-- Menu -->
+                <div class="menu-section">
+                    <h3>🔍 Tools</h3>
+                    <div class="menu-item active" data-view="search">
+                        <span class="menu-icon">🔍</span>
+                        <span>Search</span>
+                    </div>
+                    <div class="menu-item" data-view="collections">
+                        <span class="menu-icon">📚</span>
+                        <span>Collections</span>
+                    </div>
+                    <div class="menu-item" data-view="groups">
+                        <span class="menu-icon">📂</span>
+                        <span>Groups</span>
+                    </div>
+                    <div class="menu-item" data-view="tags">
+                        <span class="menu-icon">🏷️</span>
+                        <span>Tags</span>
+                    </div>
+                    <div class="menu-item" data-view="export">
+                        <span class="menu-icon">📤</span>
+                        <span>Export</span>
+                    </div>
+                    <div class="menu-item" data-view="analytics">
+                        <span class="menu-icon">📊</span>
+                        <span>Analytics</span>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="menu-section">
+                    <h3>⚡ Quick Actions</h3>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">
+                        🎯 AI Analysis
+                    </button>
+                    <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.5rem;">
+                        📈 Generate Report
+                    </button>
+                    <button class="btn btn-secondary" style="width: 100%;">
+                        🔖 Bulk Tag
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Search View -->
+                <div id="search-view" class="view-content">
+                    <div class="content-header">
+                        <h2 class="content-title">🔍 Search Conversations</h2>
+                        <div class="search-container">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="search-input" id="search-input" placeholder="Search titles, content, or tags...">
+                        </div>
+                    </div>
+
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>Type:</label>
+                            <select class="filter-select" id="search-type">
+                                <option value="both">Title + Content</option>
+                                <option value="title">Title Only</option>
+                                <option value="content">Content Only</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Sort:</label>
+                            <select class="filter-select" id="sort-order">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="relevance">Most Relevant</option>
+                                <option value="longest">Longest First</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Limit:</label>
+                            <select class="filter-select" id="result-limit">
+                                <option value="25">25 Results</option>
+                                <option value="50">50 Results</option>
+                                <option value="100">100 Results</option>
+                                <option value="all">All Results</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="search-btn">
+                            🔍 Search
+                        </button>
+                    </div>
+
+                    <div id="search-results" class="results-grid">
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <h3>Ready to Search</h3>
+                            <p>Load your conversations.json file and start exploring your ChatGPT history</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collections View -->
+                <div id="collections-view" class="view-content hidden">
+                    <div class="content-header">
+                        <h2 class="content-title">📚 Collections</h2>
+                        <button class="btn btn-primary">
+                            ➕ New Collection
+                        </button>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">📚</div>
+                        <h3>No Collections Yet</h3>
+                        <p>Create collections to group related conversations together</p>
+                    </div>
+                </div>
+
+                <!-- Groups View -->
+                <div id="groups-view" class="view-content hidden">
+                    <div class="content-header">
+                        <h2 class="content-title">📂 Groups</h2>
+                        <button class="btn btn-primary">
+                            ➕ New Group
+                        </button>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">📂</div>
+                        <h3>No Groups Yet</h3>
+                        <p>Organize conversations into named groups for better management</p>
+                    </div>
+                </div>
+
+                <!-- Tags View -->
+                <div id="tags-view" class="view-content hidden">
+                    <div class="content-header">
+                        <h2 class="content-title">🏷️ Tags</h2>
+                        <button class="btn btn-primary">
+                            ➕ Add Tag
+                        </button>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">🏷️</div>
+                        <h3>No Tags Yet</h3>
+                        <p>Tag conversations to make them easier to find and organize</p>
+                    </div>
+                </div>
+
+                <!-- Export View -->
+                <div id="export-view" class="view-content hidden">
+                    <div class="content-header">
+                        <h2 class="content-title">📤 Export</h2>
+                    </div>
+                    <div class="export-options">
+                        <div class="result-card">
+                            <h3>Export Selected Conversations</h3>
+                            <p class="text-muted mb-2">Export your selected conversations in various formats</p>
+                            <div class="flex gap-1">
+                                <button class="btn btn-secondary">📄 JSON</button>
+                                <button class="btn btn-secondary">📝 Markdown</button>
+                                <button class="btn btn-secondary">🌐 HTML</button>
+                                <button class="btn btn-secondary">📊 CSV</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics View -->
+                <div id="analytics-view" class="view-content hidden">
+                    <div class="content-header">
+                        <h2 class="content-title">📊 Analytics</h2>
+                    </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <h3>Analytics Coming Soon</h3>
+                        <p>Discover insights about your conversation patterns and topics</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for Conversation Details -->
+    <div id="conversation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Conversation Details</h3>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div id="modal-body">
+                <!-- Conversation content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let conversationsData = [];
+        let selectedConversations = new Set();
+        let currentView = 'search';
+
+        // Theme switching with persistence
+        const themeSelect = document.getElementById('theme-select');
+        
+        // Load saved theme or default to Steel Blue
+        const savedTheme = localStorage.getItem('chatgpt-theme') || 'theme-steel-blue';
+        themeSelect.value = savedTheme;
+        document.body.className = savedTheme;
+
+        themeSelect.addEventListener('change', function() {
+            const theme = this.value;
+            document.body.className = theme;
+            localStorage.setItem('chatgpt-theme', theme);
+            
+            // Add a subtle animation to show theme change
+            document.body.style.transition = 'all 0.3s ease';
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 300);
+        });
+
+        // File upload handling
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const fileStatus = document.getElementById('file-status');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+
+        async function handleFileUpload(file) {
+            if (!file.name.endsWith('.json')) {
+                showFileStatus('Please select a JSON file', 'error');
+                return;
+            }
+
+            showFileStatus('Loading...', 'loading');
+            
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // Validate data structure
+                if (!Array.isArray(data)) {
+                    throw new Error('Invalid format: Expected array of conversations');
+                }
+
+                conversationsData = data;
+                updateStats();
+                showFileStatus(`Loaded ${data.length} conversations successfully!`, 'success');
+                
+                // Enable search functionality
+                document.getElementById('search-btn').disabled = false;
+                showSearchResults(data.slice(0, 25)); // Show first 25 by default
+                
+            } catch (error) {
+                showFileStatus(`Error: ${error.message}`, 'error');
+                console.error('File parsing error:', error);
+            }
+        }
+
+        function showFileStatus(message, type) {
+            fileStatus.textContent = message;
+            fileStatus.className = `mt-1 text-center ${type === 'error' ? 'error-color' : type === 'success' ? 'success-color' : 'text-muted'}`;
+            fileStatus.classList.remove('hidden');
+            
+            if (type === 'success') {
+                setTimeout(() => fileStatus.classList.add('hidden'), 3000);
+            }
+        }
+
+        function updateStats() {
+            if (conversationsData.length === 0) return;
+
+            // Total conversations
+            document.getElementById('total-conversations').textContent = conversationsData.length.toLocaleString();
+
+            // Calculate total messages
+            let totalMessages = 0;
+            conversationsData.forEach(conv => {
+                if (conv.mapping) {
+                    totalMessages += Object.keys(conv.mapping).length;
+                }
+            });
+            document.getElementById('total-messages').textContent = totalMessages.toLocaleString();
+
+            // Date range
+            const dates = conversationsData
+                .map(conv => conv.create_time)
+                .filter(time => time)
+                .sort((a, b) => a - b);
+            
+            if (dates.length > 0) {
+                const oldest = new Date(dates[0] * 1000).getFullYear();
+                const newest = new Date(dates[dates.length - 1] * 1000).getFullYear();
+                document.getElementById('date-range').textContent = oldest === newest ? oldest : `${oldest}-${newest}`;
+            }
+
+            // Selected count
+            document.getElementById('selected-count').textContent = selectedConversations.size;
+        }
+
+        // Navigation
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const view = item.dataset.view;
+                switchView(view);
+                
+                // Update active state
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        function switchView(view) {
+            // Hide all views
+            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+            
+            // Show selected view
+            document.getElementById(`${view}-view`).classList.remove('hidden');
+            currentView = view;
+        }
+
+        // Search functionality
+        document.getElementById('search-btn').addEventListener('click', performSearch);
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        function performSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            const searchType = document.getElementById('search-type').value;
+            const sortOrder = document.getElementById('sort-order').value;
+            const limit = document.getElementById('result-limit').value;
+
+            if (!query) {
+                showSearchResults(conversationsData.slice(0, 25));
+                return;
+            }
+
+            let results = searchConversations(query, searchType);
+            results = sortResults(results, sortOrder);
+            
+            if (limit !== 'all') {
+                results = results.slice(0, parseInt(limit));
+            }
+
+            showSearchResults(results);
+        }
+
+        function searchConversations(query, type) {
+            const searchTerm = query.toLowerCase();
+            
+            return conversationsData.filter(conv => {
+                const title = (conv.title || '').toLowerCase();
+                const id = (conv.id || '').toLowerCase();
+                
+                // Extract content from mapping
+                let content = '';
+                if (conv.mapping) {
+                    Object.values(conv.mapping).forEach(msg => {
+                        if (msg.message && msg.message.content && msg.message.content.parts) {
+                            content += msg.message.content.parts.join(' ').toLowerCase() + ' ';
+                        }
+                    });
+                }
+
+                switch (type) {
+                    case 'title':
+                        return title.includes(searchTerm) || id.includes(searchTerm);
+                    case 'content':
+                        return content.includes(searchTerm);
+                    case 'both':
+                    default:
+                        return title.includes(searchTerm) || content.includes(searchTerm) || id.includes(searchTerm);
+                }
+            });
+        }
+
+        function sortResults(results, order) {
+            switch (order) {
+                case 'oldest':
+                    return results.sort((a, b) => (a.create_time || 0) - (b.create_time || 0));
+                case 'newest':
+                    return results.sort((a, b) => (b.create_time || 0) - (a.create_time || 0));
+                case 'longest':
+                    return results.sort((a, b) => {
+                        const aLength = Object.keys(a.mapping || {}).length;
+                        const bLength = Object.keys(b.mapping || {}).length;
+                        return bLength - aLength;
+                    });
+                case 'relevance':
+                default:
+                    return results; // Keep original order for relevance
+            }
+        }
+
+        function showSearchResults(results) {
+            const container = document.getElementById('search-results');
+            
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🔍</div>
+                        <h3>No Results Found</h3>
+                        <p>Try adjusting your search terms or filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = results.map(conv => createResultCard(conv)).join('');
+            
+            // Add event listeners to result cards
+            container.querySelectorAll('.result-card').forEach(card => {
+                const convId = card.dataset.id;
+                
+                card.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tag') || e.target.closest('.result-actions')) {
+                        return; // Don't trigger on tag/action clicks
+                    }
+                    showConversationModal(convId);
+                });
+
+                // Selection handling
+                const checkbox = card.querySelector('.selection-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('change', (e) => {
+                        e.stopPropagation();
+                        if (e.target.checked) {
+                            selectedConversations.add(convId);
+                            card.classList.add('selected');
+                        } else {
+                            selectedConversations.delete(convId);
+                            card.classList.remove('selected');
+                        }
+                        updateStats();
+                    });
+                }
+            });
+        }
+
+        function createResultCard(conv) {
+            const title = conv.title || 'Untitled Conversation';
+            const id = conv.id || '';
+            const shortId = id.substring(0, 8);
+            
+            // Format date
+            const date = conv.create_time ? 
+                new Date(conv.create_time * 1000).toLocaleDateString() : 
+                'Unknown date';
+            
+            // Count messages
+            const messageCount = conv.mapping ? Object.keys(conv.mapping).length : 0;
+            
+            // Extract preview text
+            let preview = '';
+            if (conv.mapping) {
+                const messages = Object.values(conv.mapping)
+                    .filter(msg => msg.message && msg.message.content && msg.message.content.parts)
+                    .slice(0, 2); // First 2 messages
+                
+                preview = messages
+                    .map(msg => msg.message.content.parts.join(' '))
+                    .join(' ')
+                    .substring(0, 200) + (messages.length > 0 ? '...' : '');
+            }
+
+            const isSelected = selectedConversations.has(id);
+
+            return `
+                <div class="result-card ${isSelected ? 'selected' : ''}" data-id="${id}">
+                    <div class="result-header">
+                        <div>
+                            <div class="result-title">${escapeHtml(title)}</div>
+                            <div class="result-meta">
+                                <span>📅 ${date}</span>
+                                <span>💬 ${messageCount} messages</span>
+                                <span>🆔 ${shortId}...</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <input type="checkbox" class="selection-checkbox" ${isSelected ? 'checked' : ''}>
+                        </div>
+                    </div>
+                    ${preview ? `<div class="result-preview">${escapeHtml(preview)}</div>` : ''}
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                            👁️ View
+                        </button>
+                        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                            🏷️ Tag
+                        </button>
+                        <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+                            📚 Collect
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Markdown renderer for chat content
+        function renderMarkdown(text) {
+            if (!text) return '';
+            
+            // Escape HTML first to prevent XSS
+            let html = escapeHtml(text);
+            
+            // Headers (#### ### ## #)
+            html = html.replace(/^#### (.*$)/gm, '<h4 style="color: var(--accent-color); margin: 0.8rem 0 0.4rem 0; font-size: 1rem; font-weight: 600;">$1</h4>');
+            html = html.replace(/^### (.*$)/gm, '<h3 style="color: var(--accent-color); margin: 1rem 0 0.5rem 0; font-size: 1.1rem; font-weight: 600;">$1</h3>');
+            html = html.replace(/^## (.*$)/gm, '<h2 style="color: var(--accent-color); margin: 1.2rem 0 0.6rem 0; font-size: 1.25rem; font-weight: 600;">$1</h2>');
+            html = html.replace(/^# (.*$)/gm, '<h1 style="color: var(--accent-color); margin: 1.5rem 0 0.8rem 0; font-size: 1.4rem; font-weight: 700;">$1</h1>');
+            
+            // Bold text (**text** or __text__)
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>');
+            html = html.replace(/__(.*?)__/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>');
+            
+            // Italic text (*text* or _text_)
+            html = html.replace(/\*(.*?)\*/g, '<em style="color: var(--text-secondary); font-style: italic;">$1</em>');
+            html = html.replace(/_(.*?)_/g, '<em style="color: var(--text-secondary); font-style: italic;">$1</em>');
+            
+            // Code blocks (```language...```)
+            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, language, code) {
+                const lang = language ? ` data-language="${language}"` : '';
+                return `<div style="margin: 1rem 0; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden;">
+                    ${language ? `<div style="background: var(--bg-tertiary); padding: 0.5rem 1rem; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color);">${language}</div>` : ''}
+                    <pre style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.4; color: var(--text-primary);"><code${lang}>${code.trim()}</code></pre>
+                </div>`;
+            });
+            
+            // Inline code (`text`)
+            html = html.replace(/`([^`]+)`/g, '<code style="background: var(--bg-primary); color: var(--accent-color); padding: 0.2rem 0.4rem; border-radius: 3px; font-family: \'Courier New\', monospace; font-size: 0.9em; border: 1px solid var(--border-color);">$1</code>');
+            
+            // Lists (- or * or 1.)
+            html = html.replace(/^(\s*)[-*+] (.+)/gm, '$1<li style="margin: 0.25rem 0; color: var(--text-primary);">$2</li>');
+            html = html.replace(/^(\s*)(\d+)\. (.+)/gm, '$1<li style="margin: 0.25rem 0; color: var(--text-primary);" data-number="$2">$3</li>');
+            
+            // Wrap consecutive list items in ul/ol
+            html = html.replace(/(<li[^>]*>.*<\/li>(\n|$))+/g, function(match) {
+                if (match.includes('data-number=')) {
+                    return `<ol style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-primary);">${match}</ol>`;
+                } else {
+                    return `<ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-primary);">${match}</ul>`;
+                }
+            });
+            
+            // Links [text](url)
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-color); text-decoration: underline;" onmouseover="this.style.color=\'var(--accent-hover)\'" onmouseout="this.style.color=\'var(--accent-color)\'">$1</a>');
+            
+            // Blockquotes (> text)
+            html = html.replace(/^> (.+)/gm, '<blockquote style="margin: 0.5rem 0; padding: 0.5rem 1rem; border-left: 3px solid var(--accent-color); background: var(--bg-primary); color: var(--text-secondary); font-style: italic;">$1</blockquote>');
+            
+            // Horizontal rules (--- or ***)
+            html = html.replace(/^(---|\*\*\*|___)$/gm, '<hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border-color);">');
+            
+            // Convert line breaks to paragraphs (but preserve formatting)
+            html = html.replace(/\n\n+/g, '</p><p style="margin: 0.75rem 0; line-height: 1.6; color: var(--text-primary);">');
+            html = '<p style="margin: 0.75rem 0; line-height: 1.6; color: var(--text-primary);">' + html + '</p>';
+            
+            // Clean up empty paragraphs and fix list formatting
+            html = html.replace(/<p[^>]*><\/p>/g, '');
+            html = html.replace(/<p([^>]*)>(<[uo]l[^>]*>.*<\/[uo]l>)<\/p>/g, '$2');
+            html = html.replace(/<p([^>]*)>(<h[1-6][^>]*>.*<\/h[1-6]>)<\/p>/g, '$2');
+            html = html.replace(/<p([^>]*)>(<div[^>]*>.*<\/div>)<\/p>/g, '$2');
+            html = html.replace(/<p([^>]*)>(<blockquote[^>]*>.*<\/blockquote>)<\/p>/g, '$2');
+            html = html.replace(/<p([^>]*)>(<hr[^>]*>)<\/p>/g, '$2');
+            
+            return html;
+        }
+
+        // Modal functionality
+        const modal = document.getElementById('conversation-modal');
+        const modalClose = document.getElementById('modal-close');
+
+        modalClose.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+            }
+        });
+
+        function showConversationModal(convId) {
+            const conversation = conversationsData.find(conv => conv.id === convId);
+            if (!conversation) return;
+
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+
+            modalTitle.textContent = conversation.title || 'Untitled Conversation';
+
+            // Extract and format messages with filtering capability
+            let messagesHtml = '';
+            if (conversation.mapping) {
+                const allMessages = Object.values(conversation.mapping)
+                    .filter(msg => msg.message && msg.message.content && msg.message.content.parts)
+                    .sort((a, b) => (a.message.create_time || 0) - (b.message.create_time || 0));
+
+                const renderMessages = (filterRole = 'both') => {
+                    const filteredMessages = filterRole === 'both' ? allMessages : 
+                        allMessages.filter(msg => (msg.message.author?.role || 'unknown') === filterRole);
+
+                    return filteredMessages.map(msg => {
+                        const role = msg.message.author?.role || 'unknown';
+                        const content = msg.message.content.parts.join('\n');
+                        const roleIcon = role === 'user' ? '👤' : role === 'assistant' ? '🤖' : '❓';
+                        const roleColor = role === 'user' ? 'var(--accent-color)' : 'var(--success-color)';
+
+                        return `
+                            <div class="message-block" data-role="${role}" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid ${roleColor};">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-weight: 500;">
+                                    <span>${roleIcon}</span>
+                                    <span style="color: ${roleColor}; text-transform: capitalize;">${role}</span>
+                                </div>
+                                <div style="line-height: 1.6;">${renderMarkdown(content)}</div>
+                            </div>
+                        `;
+                    }).join('');
+                };
+
+                messagesHtml = renderMessages('both');
+            }
+
+            modalBody.innerHTML = `
+                <div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h4>Conversation Details</h4>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <label style="font-size: 0.9rem;">Show:</label>
+                            <select id="message-filter" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                                <option value="both">👥 Both</option>
+                                <option value="user">👤 User Only</option>
+                                <option value="assistant">🤖 Assistant Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                        <div><strong>ID:</strong> ${conversation.id || 'N/A'}</div>
+                        <div><strong>Created:</strong> ${conversation.create_time ? new Date(conversation.create_time * 1000).toLocaleString() : 'N/A'}</div>
+                        <div><strong>Updated:</strong> ${conversation.update_time ? new Date(conversation.update_time * 1000).toLocaleString() : 'N/A'}</div>
+                        <div><strong>Model:</strong> ${conversation.default_model_slug || 'N/A'}</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 1rem;">Messages</h4>
+                    <div id="messages-container">
+                        ${messagesHtml || '<p class="text-muted">No messages found</p>'}
+                    </div>
+                </div>
+            `;
+
+            // Add event listener for message filtering
+            const messageFilter = modalBody.querySelector('#message-filter');
+            if (messageFilter) {
+                messageFilter.addEventListener('change', (e) => {
+                    const filterValue = e.target.value;
+                    const messagesContainer = modalBody.querySelector('#messages-container');
+                    
+                    if (conversation.mapping) {
+                        const allMessages = Object.values(conversation.mapping)
+                            .filter(msg => msg.message && msg.message.content && msg.message.content.parts)
+                            .sort((a, b) => (a.message.create_time || 0) - (b.message.create_time || 0));
+
+                        const filteredMessages = filterValue === 'both' ? allMessages : 
+                            allMessages.filter(msg => (msg.message.author?.role || 'unknown') === filterValue);
+
+                        const newMessagesHtml = filteredMessages.map(msg => {
+                            const role = msg.message.author?.role || 'unknown';
+                            const content = msg.message.content.parts.join('\n');
+                            const roleIcon = role === 'user' ? '👤' : role === 'assistant' ? '🤖' : '❓';
+                            const roleColor = role === 'user' ? 'var(--accent-color)' : 'var(--success-color)';
+
+                            return `
+                                <div class="message-block" data-role="${role}" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 3px solid ${roleColor};">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-weight: 500;">
+                                        <span>${roleIcon}</span>
+                                        <span style="color: ${roleColor}; text-transform: capitalize;">${role}</span>
+                                    </div>
+                                    <div style="line-height: 1.6;">${renderMarkdown(content)}</div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        messagesContainer.innerHTML = newMessagesHtml || `<p class="text-muted">No ${filterValue === 'both' ? '' : filterValue + ' '}messages found</p>`;
+                    }
+                });
+            }
+
+            modal.classList.add('show');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for localStorage data (if previously loaded)
+            const savedData = localStorage.getItem('chatgpt-conversations');
+            if (savedData) {
+                try {
+                    conversationsData = JSON.parse(savedData);
+                    updateStats();
+                    showFileStatus('Loaded from previous session', 'success');
+                    showSearchResults(conversationsData.slice(0, 25));
+                } catch (error) {
+                    localStorage.removeItem('chatgpt-conversations');
+                }
+            }
+
+            // Auto-search on input
+            let searchTimeout;
+            document.getElementById('search-input').addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (conversationsData.length > 0) {
+                        performSearch();
+                    }
+                }, 300);
+            });
+        });
+
+        // Save data to localStorage when loaded
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('chatgpt-conversations', JSON.stringify(conversationsData));
+            } catch (error) {
+                console.warn('Could not save to localStorage:', error);
+            }
+        }
+
+        // Update the handleFileUpload function to save data
+        async function handleFileUpload(file) {
+            if (!file.name.endsWith('.json')) {
+                showFileStatus('Please select a JSON file', 'error');
+                return;
+            }
+
+            showFileStatus('Loading...', 'loading');
+            
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+                
+                // Validate data structure
+                if (!Array.isArray(data)) {
+                    throw new Error('Invalid format: Expected array of conversations');
+                }
+
+                conversationsData = data;
+                updateStats();
+                showFileStatus(`Loaded ${data.length} conversations successfully!`, 'success');
+                
+                // Save to localStorage
+                saveToLocalStorage();
+                
+                // Enable search functionality
+                document.getElementById('search-btn').disabled = false;
+                showSearchResults(data.slice(0, 25)); // Show first 25 by default
+                
+            } catch (error) {
+                showFileStatus(`Error: ${error.message}`, 'error');
+                console.error('File parsing error:', error);
+            }
+        }
+
+        // Export functionality placeholder
+        document.querySelectorAll('#export-view .btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const format = btn.textContent.toLowerCase();
+                if (selectedConversations.size === 0) {
+                    alert('Please select conversations to export');
+                    return;
+                }
+                
+                // Placeholder for export functionality
+                alert(`Export to ${format} functionality will be implemented soon!\nSelected conversations: ${selectedConversations.size}`);
+            });
+        });
+
+        // AI Analysis placeholder
+        document.querySelector('[data-view="analytics"]')?.parentElement?.querySelector('.btn')?.addEventListener('click', () => {
+            alert('AI Analysis feature coming soon! This will provide automatic tagging and content analysis.');
+        });
+    </script>
+</body>
+</html>
