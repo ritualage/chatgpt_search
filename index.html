@@ -627,6 +627,10 @@
                     <span class="stat-value" id="date-range">-</span>
                     <span class="stat-label">Date Range</span>
                 </div>
+                <div class="stat-item" id="search-results-stat" style="display: none;">
+                    <span class="stat-value" id="search-results-count">0</span>
+                    <span class="stat-label">Search Results</span>
+                </div>
                 <div class="stat-item">
                     <span class="stat-value" id="selected-count">0</span>
                     <span class="stat-label">Selected</span>
@@ -1066,13 +1070,24 @@
 
         function showSearchResults(results) {
             const container = document.getElementById('search-results');
+            const searchResultsStat = document.getElementById('search-results-stat');
+            const searchResultsCount = document.getElementById('search-results-count');
+            
+            // Update search results counter
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                searchResultsStat.style.display = 'block';
+                searchResultsCount.textContent = results.length.toLocaleString();
+            } else {
+                searchResultsStat.style.display = 'none';
+            }
             
             if (results.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🔍</div>
-                        <h3>No Results Found</h3>
-                        <p>Try adjusting your search terms or filters</p>
+                        <h3>${query ? 'No Results Found' : 'Ready to Search'}</h3>
+                        <p>${query ? 'Try adjusting your search terms or filters' : 'Load your conversations.json file and start exploring your ChatGPT history'}</p>
                     </div>
                 `;
                 return;
@@ -1382,13 +1397,16 @@
                 }
             }
 
-            // Auto-search on input
+            // Auto-search on input with search results counter update
             let searchTimeout;
             document.getElementById('search-input').addEventListener('input', () => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     if (conversationsData.length > 0) {
                         performSearch();
+                    } else {
+                        // Hide search results counter when no data
+                        document.getElementById('search-results-stat').style.display = 'none';
                     }
                 }, 300);
             });
