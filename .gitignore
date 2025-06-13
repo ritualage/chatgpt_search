@@ -1,0 +1,12 @@
+# User data files - NEVER commit personal chat data
+conversations.json
+*.db
+*.sqlite*
+ChatGPT_Exports/
+data/
+exports/
+
+# System files
+.DS_Store
+Thumbs.db
+*.log
