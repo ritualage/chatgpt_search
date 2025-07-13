@@ -16,8 +16,13 @@ MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Default directory or use provided argument
-CHAT_DIR="${1:-/home/tuxnuc/Documents/ChatGPT_Exports/ChatGPT_13-06-2025}"
+CHAT_DIR="${1:-/Users/pmo/ai/data/processed/ChatGPT-exports/2025-07-12}"
 DB_FILE="$CHAT_DIR/chatgpt_conversations.db"
+
+# Location of local chat.html conversations.json message_feedback.json shared_conversations.json user.json
+SRC_DIR='/Users/pmo/ai/data/raw/ChatGPT-exports/2025-07-12'
+
+
 
 echo -e "${CYAN}🧠 ChatGPT SQLite Database Parser & Interrogator v0.6${NC}"
 echo -e "${CYAN}===================================================${NC}"
@@ -69,11 +74,12 @@ check_dependencies() {
 echo -e "${BLUE}📁 File Structure Analysis${NC}"
 echo -e "${BLUE}=========================${NC}"
 for file in chat.html conversations.json message_feedback.json shared_conversations.json user.json; do
-    if [ -f "$file" ]; then
-        size=$(du -h "$file" | cut -f1)
-        echo -e "✅ $file (${size})"
+    full_path="${SRC_DIR}/${file}"
+    if [ -f "$full_path" ]; then
+        size=$(du -h "$full_path" | cut -f1)
+        echo -e "✅ $full_path (${size})"
     else
-        echo -e "❌ $file (missing)"
+        echo -e "❌ $full_path (missing)"
     fi
 done
 echo
@@ -202,6 +208,7 @@ parse_json_to_sqlite() {
     
     $PYTHON_CMD << 'EOF'
 import json
+import os
 import sqlite3
 import sys
 from datetime import datetime
@@ -212,10 +219,15 @@ def safe_str(value):
         return ""
     return str(value).replace("'", "''")
 
+full_path="${SRC_DIR}/${file}"
+
 try:
     # Load JSON data
     print("Loading JSON data...")
-    with open('conversations.json', 'r', encoding='utf-8') as f:
+    SRC_DIR = '/Users/pmo/ai/data/raw/ChatGPT-exports/2025-07-12'
+    json_path = os.path.join(SRC_DIR, 'conversations.json')
+
+    with open(json_path, 'r', encoding='utf-8') as f:
         conversations = json.load(f)
     
     print(f"Found {len(conversations)} conversations")
@@ -1096,7 +1108,8 @@ main() {
     
     # Check if database exists and is recent
     if [ -f "$DB_FILE" ]; then
-        local json_newer=$(find "conversations.json" -newer "$DB_FILE" 2>/dev/null | wc -l)
+        local json_file="${SRC_DIR}/conversations.json"
+        local json_newer=$(find "$json_file" -newer "$DB_FILE" 2>/dev/null | wc -l)
         
         if [ "$json_newer" -gt 0 ]; then
             echo -e "${YELLOW}🔄 JSON file is newer than database. Re-parsing...${NC}"
