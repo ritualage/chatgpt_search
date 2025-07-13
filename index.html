@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,6 +74,72 @@
             --text-primary: #eef2f5;
             --border-color: #343a3e;
         }
+
+        .theme-morning-mist {
+            --bg-primary: #f5f7f9;
+            --bg-secondary: #e9edf0;
+            --bg-tertiary: #dfe5e9;
+            --accent-color: #5a7a8f;
+            --accent-hover: #4a6b80;
+            --text-primary: #1c1f22;
+            --text-secondary: #444;
+            --text-muted: #777;
+            --border-color: #ccd4da;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --error-color: #dc3545;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-sandstone-cream {
+            --bg-primary: #fefcf9;
+            --bg-secondary: #f5f1ec;
+            --bg-tertiary: #ebe6df;
+            --accent-color: #b48a65;
+            --accent-hover: #a37858;
+            --text-primary: #2d2a20;
+            --text-secondary: #5c564c;
+            --text-muted: #90897f;
+            --border-color: #ddd3c7;
+            --success-color: #34c38f;
+            --warning-color: #f1b44c;
+            --error-color: #f46a6a;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-cursor-light {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --bg-tertiary: #eaeef2;
+
+            --accent-color: #6f42c1;
+            /* soft purple */
+            --accent-hover: #825ad4;
+
+            --text-primary: #1f2328;
+            /* near-black for text */
+            --text-secondary: #4b5563;
+            /* muted gray */
+            --text-muted: #6b7280;
+
+            --border-color: #d0d7de;
+
+            --success-color: #2ea043;
+            /* GitHub green */
+            --warning-color: #d29922;
+            /* warm amber */
+            --error-color: #cf222e;
+            /* GitHub red */
+
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+        }
+
+
+
+
 
         /* Global Styles */
         * {
@@ -473,8 +540,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Empty States */
@@ -574,21 +646,60 @@
         }
 
         /* Utility Classes */
-        .text-center { text-align: center; }
-        .text-muted { color: var(--text-muted); }
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-        .mt-1 { margin-top: 0.5rem; }
-        .mt-2 { margin-top: 1rem; }
-        .hidden { display: none; }
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-1 { gap: 0.5rem; }
-        .gap-2 { gap: 1rem; }
+        .text-center {
+            text-align: center;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .mb-1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-2 {
+            margin-top: 1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-1 {
+            gap: 0.5rem;
+        }
+
+        .gap-2 {
+            gap: 1rem;
+        }
     </style>
 </head>
+
 <body>
     <!-- Header -->
     <header class="header">
@@ -600,8 +711,11 @@
                 <div class="theme-selector">
                     <label for="theme-select">Theme:</label>
                     <select id="theme-select">
-                        <option value="theme-steel-blue">Steel Blue</option>
+                        <option value="theme-sandstone-cream">Sandstone Cream</option>
+                        <option value="theme-morning-mist">Morning Mist</option>
+                        <option value="theme-cursor-light">Cursor Light</option>
                         <option value="">Current</option>
+                        <option value="theme-steel-blue">Steel Blue</option>
                         <option value="theme-warm-slate">Warm Slate</option>
                         <option value="theme-sage-green">Sage Green</option>
                         <option value="theme-forest-moss">Forest Moss</option>
@@ -708,7 +822,8 @@
                         <h2 class="content-title">🔍 Search Conversations</h2>
                         <div class="search-container">
                             <span class="search-icon">🔍</span>
-                            <input type="text" class="search-input" id="search-input" placeholder="Search titles, content, or tags...">
+                            <input type="text" class="search-input" id="search-input"
+                                placeholder="Search titles, content, or tags...">
                         </div>
                     </div>
 
@@ -748,10 +863,12 @@
                         </button>
                     </div>
 
-                    <div id="tag-browser" class="hidden" style="background: var(--bg-tertiary); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <div id="tag-browser" class="hidden"
+                        style="background: var(--bg-tertiary); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
                         <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1rem;">
                             <h4 style="color: var(--accent-color);">🏷️ Available Tags</h4>
-                            <button id="hide-tags-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">✕ Hide</button>
+                            <button id="hide-tags-btn" class="btn btn-secondary"
+                                style="font-size: 0.8rem; padding: 0.3rem 0.6rem;">✕ Hide</button>
                         </div>
                         <div id="tag-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                             <!-- Tags will be populated here -->
@@ -867,17 +984,17 @@
 
         // Theme switching with persistence
         const themeSelect = document.getElementById('theme-select');
-        
+
         // Load saved theme or default to Steel Blue
         const savedTheme = localStorage.getItem('chatgpt-theme') || 'theme-steel-blue';
         themeSelect.value = savedTheme;
         document.body.className = savedTheme;
 
-        themeSelect.addEventListener('change', function() {
+        themeSelect.addEventListener('change', function () {
             const theme = this.value;
             document.body.className = theme;
             localStorage.setItem('chatgpt-theme', theme);
-            
+
             // Add a subtle animation to show theme change
             document.body.style.transition = 'all 0.3s ease';
             setTimeout(() => {
@@ -891,7 +1008,7 @@
         const fileStatus = document.getElementById('file-status');
 
         uploadArea.addEventListener('click', () => fileInput.click());
-        
+
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
@@ -923,11 +1040,11 @@
             }
 
             showFileStatus('Loading...', 'loading');
-            
+
             try {
                 const text = await file.text();
                 const data = JSON.parse(text);
-                
+
                 // Validate data structure
                 if (!Array.isArray(data)) {
                     throw new Error('Invalid format: Expected array of conversations');
@@ -936,11 +1053,11 @@
                 conversationsData = data;
                 updateStats();
                 showFileStatus(`Loaded ${data.length} conversations successfully!`, 'success');
-                
+
                 // Enable search functionality
                 document.getElementById('search-btn').disabled = false;
                 showSearchResults(data.slice(0, 25)); // Show first 25 by default
-                
+
             } catch (error) {
                 showFileStatus(`Error: ${error.message}`, 'error');
                 console.error('File parsing error:', error);
@@ -951,7 +1068,7 @@
             fileStatus.textContent = message;
             fileStatus.className = `mt-1 text-center ${type === 'error' ? 'error-color' : type === 'success' ? 'success-color' : 'text-muted'}`;
             fileStatus.classList.remove('hidden');
-            
+
             if (type === 'success') {
                 setTimeout(() => fileStatus.classList.add('hidden'), 3000);
             }
@@ -977,7 +1094,7 @@
                 .map(conv => conv.create_time)
                 .filter(time => time)
                 .sort((a, b) => a - b);
-            
+
             if (dates.length > 0) {
                 const oldest = new Date(dates[0] * 1000).getFullYear();
                 const newest = new Date(dates[dates.length - 1] * 1000).getFullYear();
@@ -993,7 +1110,7 @@
             item.addEventListener('click', () => {
                 const view = item.dataset.view;
                 switchView(view);
-                
+
                 // Update active state
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
                 item.classList.add('active');
@@ -1003,7 +1120,7 @@
         function switchView(view) {
             // Hide all views
             document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
-            
+
             // Show selected view
             document.getElementById(`${view}-view`).classList.remove('hidden');
             currentView = view;
@@ -1027,7 +1144,7 @@
             }
 
             let results;
-            
+
             if (searchType === 'tags') {
                 // Tag-based search
                 const tagNames = query.split(',').map(tag => tag.trim()).filter(tag => tag);
@@ -1036,9 +1153,9 @@
                 // Traditional content search
                 results = searchConversations(query, searchType);
             }
-            
+
             results = sortResults(results, sortOrder);
-            
+
             if (limit !== 'all') {
                 results = results.slice(0, parseInt(limit));
             }
@@ -1048,11 +1165,11 @@
 
         function searchConversations(query, type) {
             const searchTerm = query.toLowerCase();
-            
+
             return conversationsData.filter(conv => {
                 const title = (conv.title || '').toLowerCase();
                 const id = (conv.id || '').toLowerCase();
-                
+
                 // Extract content from mapping
                 let content = '';
                 if (conv.mapping) {
@@ -1097,7 +1214,7 @@
             const container = document.getElementById('search-results');
             const searchResultsStat = document.getElementById('search-results-stat');
             const searchResultsCount = document.getElementById('search-results-count');
-            
+
             // Update search results counter
             const query = document.getElementById('search-input').value.trim();
             if (query) {
@@ -1106,7 +1223,7 @@
             } else {
                 searchResultsStat.style.display = 'none';
             }
-            
+
             if (results.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
@@ -1119,11 +1236,11 @@
             }
 
             container.innerHTML = results.map(conv => createResultCard(conv)).join('');
-            
+
             // Add event listeners to result cards
             container.querySelectorAll('.result-card').forEach(card => {
                 const convId = card.dataset.id;
-                
+
                 card.addEventListener('click', (e) => {
                     if (e.target.classList.contains('tag') || e.target.closest('.result-actions')) {
                         return; // Don't trigger on tag/action clicks
@@ -1153,22 +1270,22 @@
             const title = conv.title || 'Untitled Conversation';
             const id = conv.id || '';
             const shortId = id.substring(0, 8);
-            
+
             // Format date
-            const date = conv.create_time ? 
-                new Date(conv.create_time * 1000).toLocaleDateString() : 
+            const date = conv.create_time ?
+                new Date(conv.create_time * 1000).toLocaleDateString() :
                 'Unknown date';
-            
+
             // Count messages
             const messageCount = conv.mapping ? Object.keys(conv.mapping).length : 0;
-            
+
             // Extract preview text
             let preview = '';
             if (conv.mapping) {
                 const messages = Object.values(conv.mapping)
                     .filter(msg => msg.message && msg.message.content && msg.message.content.parts)
                     .slice(0, 2); // First 2 messages
-                
+
                 preview = messages
                     .map(msg => msg.message.content.parts.join(' '))
                     .join(' ')
@@ -1177,13 +1294,13 @@
 
             // Get existing tags for this conversation
             const existingTags = loadConversationTags(id);
-            const tagsHTML = existingTags.length > 0 ? 
+            const tagsHTML = existingTags.length > 0 ?
                 `<div class="conversation-tags" style="margin-top: 0.5rem;">
-                    ${existingTags.map(tag => 
-                        `<span class="tag" style="background: var(--accent-color); color: var(--bg-primary); padding: 0.2rem 0.4rem; border-radius: 12px; font-size: 0.7rem; margin-right: 0.3rem;">
+                    ${existingTags.map(tag =>
+                    `<span class="tag" style="background: var(--accent-color); color: var(--bg-primary); padding: 0.2rem 0.4rem; border-radius: 12px; font-size: 0.7rem; margin-right: 0.3rem;">
                             ${tag.type === 'category' ? '📂' : '🏷️'} ${tag.name}
                         </span>`
-                    ).join('')}
+                ).join('')}
                 </div>` : '';
 
             const isSelected = selectedConversations.has(id);
@@ -1226,7 +1343,7 @@
             const text = extractTextFromConversation(conversation);
             const words = analyzeConversationContent(text);
             const tags = generateTagsFromAnalysis(words, conversation);
-            
+
             return {
                 words: words,
                 suggestedTags: tags,
@@ -1236,12 +1353,12 @@
 
         function extractTextFromConversation(conversation) {
             let allText = '';
-            
+
             // Add title
             if (conversation.title) {
                 allText += conversation.title + ' ';
             }
-            
+
             // Extract all message content
             if (conversation.mapping) {
                 Object.values(conversation.mapping).forEach(msg => {
@@ -1250,7 +1367,7 @@
                     }
                 });
             }
-            
+
             return allText;
         }
 
@@ -1260,7 +1377,7 @@
                 .replace(/[^\w\s]/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();
-            
+
             // Common stop words to filter out
             const stopWords = new Set([
                 'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
@@ -1273,7 +1390,7 @@
                 'like', 'want', 'need', 'know', 'think', 'see', 'get', 'go', 'come', 'make', 'take', 'give',
                 'please', 'help', 'thanks', 'thank', 'yes', 'no', 'ok', 'okay', 'sure', 'well', 'actually'
             ]);
-            
+
             // Split into words and count frequency
             const words = cleanText.split(/\s+/)
                 .filter(word => word.length > 2 && !stopWords.has(word))
@@ -1281,7 +1398,7 @@
                     acc[word] = (acc[word] || 0) + 1;
                     return acc;
                 }, {});
-            
+
             // Sort by frequency and return top words
             return Object.entries(words)
                 .sort((a, b) => b[1] - a[1])
@@ -1291,7 +1408,7 @@
 
         function generateTagsFromAnalysis(words, conversation) {
             const tags = [];
-            
+
             // Category detection patterns
             const categories = {
                 'programming': ['code', 'programming', 'python', 'javascript', 'html', 'css', 'function', 'variable', 'array', 'object', 'class', 'method', 'api', 'database', 'sql', 'git', 'debug', 'error', 'syntax'],
@@ -1302,11 +1419,11 @@
                 'research': ['research', 'analysis', 'data', 'statistics', 'report', 'findings', 'methodology', 'results', 'conclusions', 'evidence'],
                 'personal': ['personal', 'life', 'advice', 'decision', 'problem', 'solution', 'help', 'support', 'guidance', 'recommendation']
             };
-            
+
             // Check for category matches
             const wordList = words.map(w => w.word);
             for (const [category, keywords] of Object.entries(categories)) {
-                const matches = keywords.filter(keyword => 
+                const matches = keywords.filter(keyword =>
                     wordList.some(word => word.includes(keyword) || keyword.includes(word))
                 );
                 if (matches.length > 0) {
@@ -1319,7 +1436,7 @@
                     });
                 }
             }
-            
+
             // Generate keyword tags from top words
             words.slice(0, 10).forEach(({ word, count }) => {
                 if (word.length > 3 && count > 1) {
@@ -1332,7 +1449,7 @@
                     });
                 }
             });
-            
+
             return tags;
         }
 
@@ -1347,14 +1464,14 @@
 
         function createWordCloudHTML(words, tags) {
             const maxCount = Math.max(...words.map(w => w.count));
-            
+
             return `
                 <div class="word-cloud-container" style="background: var(--bg-primary); border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
                     <div class="word-cloud" style="text-align: center; line-height: 1.8; flex-wrap: wrap; display: flex; justify-content: center; gap: 0.5rem;">
                         ${words.map(({ word, count }) => {
-                            const size = Math.max(0.8, (count / maxCount) * 2.5);
-                            const opacity = Math.max(0.6, count / maxCount);
-                            return `
+                const size = Math.max(0.8, (count / maxCount) * 2.5);
+                const opacity = Math.max(0.6, count / maxCount);
+                return `
                                 <span class="word-cloud-item" 
                                       style="font-size: ${size}rem; 
                                              opacity: ${opacity}; 
@@ -1373,7 +1490,7 @@
                                     ${word}
                                 </span>
                             `;
-                        }).join('')}
+            }).join('')}
                     </div>
                 </div>
                 
@@ -1409,7 +1526,7 @@
             // Add word as a custom tag
             const tagContainer = document.querySelector('.tag-suggestions');
             const existingTag = tagContainer.querySelector(`[data-tag="${word}"]`);
-            
+
             if (!existingTag) {
                 const tagElement = document.createElement('div');
                 tagElement.className = 'tag-suggestion selected';
@@ -1429,14 +1546,14 @@
                 tagElement.setAttribute('onclick', 'toggleTag(this)');
                 tagElement.title = `Added from word cloud | Frequency: ${count}`;
                 tagElement.innerHTML = `🏷️ ${word} ✓`;
-                
+
                 tagContainer.appendChild(tagElement);
             }
         }
 
         function toggleTag(element) {
             const isSelected = element.classList.contains('selected');
-            
+
             if (isSelected) {
                 element.classList.remove('selected');
                 element.style.background = 'var(--bg-tertiary)';
@@ -1471,12 +1588,12 @@
                 tags: tags,
                 timestamp: new Date().toISOString()
             };
-            
+
             // For now, save to localStorage and prepare for database integration
             const savedTags = JSON.parse(localStorage.getItem('conversation-tags') || '{}');
             savedTags[conversationId] = tags;
             localStorage.setItem('conversation-tags', JSON.stringify(savedTags));
-            
+
             // Also maintain global tag dictionary for search autocomplete
             const globalTags = JSON.parse(localStorage.getItem('global-tags') || '{}');
             tags.forEach(tag => {
@@ -1494,10 +1611,10 @@
                 }
             });
             localStorage.setItem('global-tags', JSON.stringify(globalTags));
-            
+
             // Call database integration function
             saveToDB(conversationId, tags);
-            
+
             // Update UI to show tags are saved
             const saveButton = document.querySelector('#save-tags-btn');
             if (saveButton) {
@@ -1522,11 +1639,11 @@
                     created_at: new Date().toISOString()
                 }))
             };
-            
+
             // In a full implementation, this would call the shell script backend
             // For now, we'll simulate the database operation
             console.log('Saving to database:', tagData);
-            
+
             // TODO: Integrate with chatgpt_interrogator_v0.8.sh
             // Example: fetch('/api/save-tags', { method: 'POST', body: JSON.stringify(tagData) })
         }
@@ -1547,26 +1664,26 @@
             // Search conversations that have specific tags
             const results = [];
             const savedTags = JSON.parse(localStorage.getItem('conversation-tags') || '{}');
-            
+
             for (const [convId, tags] of Object.entries(savedTags)) {
                 const conversationTagNames = tags.map(tag => tag.name.toLowerCase());
-                const hasAllTags = tagNames.every(tagName => 
+                const hasAllTags = tagNames.every(tagName =>
                     conversationTagNames.includes(tagName.toLowerCase())
                 );
-                
+
                 if (hasAllTags) {
                     const conversation = conversationsData.find(conv => conv.id === convId);
                     if (conversation) {
                         results.push({
                             ...conversation,
-                            matchedTags: tags.filter(tag => 
+                            matchedTags: tags.filter(tag =>
                                 tagNames.includes(tag.name.toLowerCase())
                             )
                         });
                     }
                 }
             }
-            
+
             return results;
         }
 
@@ -1579,62 +1696,62 @@
         // Markdown renderer for chat content
         function renderMarkdown(text) {
             if (!text) return '';
-            
+
             // Escape HTML first to prevent XSS
             let html = escapeHtml(text);
-            
+
             // Headers (#### ### ## #)
             html = html.replace(/^#### (.*$)/gm, '<h4 style="color: var(--accent-color); margin: 0.8rem 0 0.4rem 0; font-size: 1rem; font-weight: 600;">$1</h4>');
             html = html.replace(/^### (.*$)/gm, '<h3 style="color: var(--accent-color); margin: 1rem 0 0.5rem 0; font-size: 1.1rem; font-weight: 600;">$1</h3>');
             html = html.replace(/^## (.*$)/gm, '<h2 style="color: var(--accent-color); margin: 1.2rem 0 0.6rem 0; font-size: 1.25rem; font-weight: 600;">$1</h2>');
             html = html.replace(/^# (.*$)/gm, '<h1 style="color: var(--accent-color); margin: 1.5rem 0 0.8rem 0; font-size: 1.4rem; font-weight: 700;">$1</h1>');
-            
+
             // Bold text (**text** or __text__)
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>');
             html = html.replace(/__(.*?)__/g, '<strong style="color: var(--text-primary); font-weight: 600;">$1</strong>');
-            
+
             // Italic text (*text* or _text_)
             html = html.replace(/\*(.*?)\*/g, '<em style="color: var(--text-secondary); font-style: italic;">$1</em>');
             html = html.replace(/_(.*?)_/g, '<em style="color: var(--text-secondary); font-style: italic;">$1</em>');
-            
+
             // Code blocks (```language...```)
-            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, language, code) {
+            html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, function (match, language, code) {
                 const lang = language ? ` data-language="${language}"` : '';
                 return `<div style="margin: 1rem 0; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden;">
                     ${language ? `<div style="background: var(--bg-tertiary); padding: 0.5rem 1rem; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-color);">${language}</div>` : ''}
                     <pre style="margin: 0; padding: 1rem; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.4; color: var(--text-primary);"><code${lang}>${code.trim()}</code></pre>
                 </div>`;
             });
-            
+
             // Inline code (`text`)
             html = html.replace(/`([^`]+)`/g, '<code style="background: var(--bg-primary); color: var(--accent-color); padding: 0.2rem 0.4rem; border-radius: 3px; font-family: \'Courier New\', monospace; font-size: 0.9em; border: 1px solid var(--border-color);">$1</code>');
-            
+
             // Lists (- or * or 1.)
             html = html.replace(/^(\s*)[-*+] (.+)/gm, '$1<li style="margin: 0.25rem 0; color: var(--text-primary);">$2</li>');
             html = html.replace(/^(\s*)(\d+)\. (.+)/gm, '$1<li style="margin: 0.25rem 0; color: var(--text-primary);" data-number="$2">$3</li>');
-            
+
             // Wrap consecutive list items in ul/ol
-            html = html.replace(/(<li[^>]*>.*<\/li>(\n|$))+/g, function(match) {
+            html = html.replace(/(<li[^>]*>.*<\/li>(\n|$))+/g, function (match) {
                 if (match.includes('data-number=')) {
                     return `<ol style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-primary);">${match}</ol>`;
                 } else {
                     return `<ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: var(--text-primary);">${match}</ul>`;
                 }
             });
-            
+
             // Links [text](url)
             html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color: var(--accent-color); text-decoration: underline;" onmouseover="this.style.color=\'var(--accent-hover)\'" onmouseout="this.style.color=\'var(--accent-color)\'">$1</a>');
-            
+
             // Blockquotes (> text)
             html = html.replace(/^> (.+)/gm, '<blockquote style="margin: 0.5rem 0; padding: 0.5rem 1rem; border-left: 3px solid var(--accent-color); background: var(--bg-primary); color: var(--text-secondary); font-style: italic;">$1</blockquote>');
-            
+
             // Horizontal rules (--- or ***)
             html = html.replace(/^(---|\*\*\*|___)$/gm, '<hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border-color);">');
-            
+
             // Convert line breaks to paragraphs (but preserve formatting)
             html = html.replace(/\n\n+/g, '</p><p style="margin: 0.75rem 0; line-height: 1.6; color: var(--text-primary);">');
             html = '<p style="margin: 0.75rem 0; line-height: 1.6; color: var(--text-primary);">' + html + '</p>';
-            
+
             // Clean up empty paragraphs and fix list formatting
             html = html.replace(/<p[^>]*><\/p>/g, '');
             html = html.replace(/<p([^>]*)>(<[uo]l[^>]*>.*<\/[uo]l>)<\/p>/g, '$2');
@@ -1642,7 +1759,7 @@
             html = html.replace(/<p([^>]*)>(<div[^>]*>.*<\/div>)<\/p>/g, '$2');
             html = html.replace(/<p([^>]*)>(<blockquote[^>]*>.*<\/blockquote>)<\/p>/g, '$2');
             html = html.replace(/<p([^>]*)>(<hr[^>]*>)<\/p>/g, '$2');
-            
+
             return html;
         }
 
@@ -1677,7 +1794,7 @@
                     .sort((a, b) => (a.message.create_time || 0) - (b.message.create_time || 0));
 
                 const renderMessages = (filterRole = 'both') => {
-                    const filteredMessages = filterRole === 'both' ? allMessages : 
+                    const filteredMessages = filterRole === 'both' ? allMessages :
                         allMessages.filter(msg => (msg.message.author?.role || 'unknown') === filterRole);
 
                     return filteredMessages.map(msg => {
@@ -1765,7 +1882,7 @@
                 // Generate word cloud analysis
                 const analysis = generateWordCloud(conversation);
                 const wordCloudHTML = createWordCloudHTML(analysis.words, analysis.suggestedTags);
-                
+
                 wordCloudContent.innerHTML = wordCloudHTML;
                 wordCloudSection.style.display = 'block';
                 showWordCloudBtn.textContent = '🔄 Regenerate Analysis';
@@ -1786,13 +1903,13 @@
                 messageFilter.addEventListener('change', (e) => {
                     const filterValue = e.target.value;
                     const messagesContainer = modalBody.querySelector('#messages-container');
-                    
+
                     if (conversation.mapping) {
                         const allMessages = Object.values(conversation.mapping)
                             .filter(msg => msg.message && msg.message.content && msg.message.content.parts)
                             .sort((a, b) => (a.message.create_time || 0) - (b.message.create_time || 0));
 
-                        const filteredMessages = filterValue === 'both' ? allMessages : 
+                        const filteredMessages = filterValue === 'both' ? allMessages :
                             allMessages.filter(msg => (msg.message.author?.role || 'unknown') === filterValue);
 
                         const newMessagesHtml = filteredMessages.map(msg => {
@@ -1867,7 +1984,7 @@
             // Update search placeholder based on search type
             const searchInput = document.getElementById('search-input');
             const searchType = document.getElementById('search-type');
-            
+
             searchType.addEventListener('change', () => {
                 const type = searchType.value;
                 switch (type) {
@@ -1889,7 +2006,7 @@
         function displayAllTags() {
             const allTags = getAllTags();
             const tagList = document.getElementById('tag-list');
-            
+
             if (allTags.length === 0) {
                 tagList.innerHTML = '<p class="text-muted">No tags created yet. Start by opening conversations and using the Word Cloud & Tags feature!</p>';
                 return;
@@ -1923,19 +2040,19 @@
         function searchByTag(tagName) {
             const searchInput = document.getElementById('search-input');
             const searchType = document.getElementById('search-type');
-            
+
             // Set search mode to tags
             searchType.value = 'tags';
-            
+
             // Set search query
             searchInput.value = tagName;
-            
+
             // Trigger search
             performSearch();
-            
+
             // Hide tag browser
             document.getElementById('tag-browser').classList.add('hidden');
-            
+
             // Focus search input for potential additional tags
             searchInput.focus();
         }
@@ -1957,11 +2074,11 @@
             }
 
             showFileStatus('Loading...', 'loading');
-            
+
             try {
                 const text = await file.text();
                 const data = JSON.parse(text);
-                
+
                 // Validate data structure
                 if (!Array.isArray(data)) {
                     throw new Error('Invalid format: Expected array of conversations');
@@ -1970,14 +2087,14 @@
                 conversationsData = data;
                 updateStats();
                 showFileStatus(`Loaded ${data.length} conversations successfully!`, 'success');
-                
+
                 // Save to localStorage
                 saveToLocalStorage();
-                
+
                 // Enable search functionality
                 document.getElementById('search-btn').disabled = false;
                 showSearchResults(data.slice(0, 25)); // Show first 25 by default
-                
+
             } catch (error) {
                 showFileStatus(`Error: ${error.message}`, 'error');
                 console.error('File parsing error:', error);
@@ -1992,7 +2109,7 @@
                     alert('Please select conversations to export');
                     return;
                 }
-                
+
                 // Placeholder for export functionality
                 alert(`Export to ${format} functionality will be implemented soon!\nSelected conversations: ${selectedConversations.size}`);
             });
@@ -2004,4 +2121,5 @@
         });
     </script>
 </body>
+
 </html>
